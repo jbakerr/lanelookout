@@ -95,7 +95,7 @@ const Home = ({ data: { loading, listReports } }) => {
         />
         { listReports && listReports.filter(r => !!r.description).map(report => (
           <CircleMarker center={[report.lat, report.lng]} radius={5} weight={0}>
-            { report.description && (<Popup>{ report.description }</Popup>)}
+            <Popup>{ report.description }</Popup>
           </CircleMarker>
         ))}
       </Map>
