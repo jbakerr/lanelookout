@@ -34,7 +34,7 @@ class ReportObstruction extends React.Component {
 
     this.state = {
       center: coordsOakland,
-      zoom: 14,
+      zoom: 18,
       filePath: '',
       uploadingImage: false,
       processing: false,
