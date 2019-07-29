@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
-import { Map, TileLayer } from 'react-leaflet'
+import { CircleMarker, Popup, Map, TileLayer } from 'react-leaflet'
 import { coordsOakland } from 'src/constants'
 import { Button, Form, Header } from 'semantic-ui-react'
 import HeatmapLayer from './HeatmapLayer'
@@ -15,6 +15,7 @@ const listReportsQuery = gql`
       id
       lat
       lng
+      description
     }
   }
 `
@@ -97,6 +98,11 @@ const Home = ({ data: { loading, listReports } }) => {
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        { listReports && listReports.filter(r => !!r.description).map(report => (
+          <CircleMarker center={[report.lat, report.lng]} radius={5} weight={0}>
+            <Popup>{ report.description }</Popup>
+          </CircleMarker>
+        ))}
       </Map>
 
       <Button color="red" fluid as={Link} to="/report" size="massive">
