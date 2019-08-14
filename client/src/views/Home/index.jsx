@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
-import { Map, TileLayer } from 'react-leaflet'
+import { CircleMarker, Popup, Map, TileLayer } from 'react-leaflet'
 import { coordsOakland } from 'src/constants'
 import { Button, Form, Header } from 'semantic-ui-react'
 import HeatmapLayer from './HeatmapLayer'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
+
+const POINT_INTENSITY = 300;
 
 const listReportsQuery = gql`
   query {
@@ -13,6 +15,7 @@ const listReportsQuery = gql`
       id
       lat
       lng
+      description
     }
   }
 `
@@ -81,17 +84,25 @@ const Home = ({ data: { loading, listReports } }) => {
         </div>
       </Form>
       <Map center={center} zoom={zoom} onDrag={onDrag} onZoom={onZoom} style={{ height }}>
-        <HeatmapLayer
-          points={listReports && listReports.map(report => [report.lat, report.lng])}
-          longitudeExtractor={m => m[1]}
-          latitudeExtractor={m => m[0]}
-          intensityExtractor={m => parseFloat(m[2])}
-          radius={12}
-        />
+        {listReports &&
+          <HeatmapLayer
+            points={listReports.map(report => [report.lat, report.lng])}
+            longitudeExtractor={m => m[1]}
+            latitudeExtractor={m => m[0]}
+            intensityExtractor={m => POINT_INTENSITY}
+            radius={12}
+            max={POINT_INTENSITY / 100}
+          />
+        }
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        { listReports && listReports.filter(r => !!r.description).map(report => (
+          <CircleMarker center={[report.lat, report.lng]} radius={5} weight={0}>
+            <Popup>{ report.description }</Popup>
+          </CircleMarker>
+        ))}
       </Map>
 
       <Button color="red" fluid as={Link} to="/report" size="massive">
